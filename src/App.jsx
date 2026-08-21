@@ -1,10 +1,17 @@
 import './App.css'
+import { useState } from 'react'
 //! Component has to start with Capital letter
 
 // const title = 'React'; // -> JavaScript string primitive
-const list = [
+
+
+const App = () => {
+// JSX - JavaScript XML - combines HTML and JavaScript
+//! -> The process of moving state from one component to another (from Search -> to App) is called lifting state
+
+const stories = [
   {
-     title: 'JavaScript',
+     title: 'React',
     url: 'https://react.dev/',
     author: 'Jordan Walke',
     num_comments: 3,
@@ -12,7 +19,7 @@ const list = [
     objectID: 0
   },
   {
-    title: 'React',
+    title: 'Angular',
     url: 'https://react.dev/',
     author: 'Jordan Walke',
     num_comments: 3,
@@ -27,78 +34,131 @@ const list = [
     points: 5,
     objectID: 2
   }
-]
+  ]
 
-const App = () => (
-// JSX - JavaScript XML - combines HTML and JavaScript
-    <>
+const [searchTerm, setSearchTerm] = useState('');
+
+  
+// -> this way we can notify the App component, when a user types into the input field in the Search component.
+  const handleSearch = (event) => {
+
+    setSearchTerm(event.target.value)
+ 
+  }
+
+  const filteredStories = stories.filter((story) => story.title.toLowerCase().includes(searchTerm.toLowerCase()))
+  
+
+  const handleTest = (message) => {
+  console.log('Message from child is:', message)
+}
+
+// console.log('App component renders!')
+   
+return (
+   <>
       <div>
         <h1>My Hacker Stories</h1>
       {/* Leaf component -> component which does not render any component */}
-        <Search />
+        <Search onSearch={handleSearch} onTest={handleTest}/>
         <hr />
         {/* Here we instantiate List component */}
-        <List /> 
-        <List />
+        <List list={filteredStories}/> 
+        <hr />
+        <Form />
+
       </div>
     </>
-  )
+    )
+  }
 
 
-const List = () => 
-    // We do not have any business logic here
-   (
-    <ul>
-          {
-            list.map((item) => 
-              (
-                    <Item item={item}/>
-                // Item is leaf component, a component which does not render any components
-              )
-            )
-          } 
-        </ul>
-  )
+const List = (props) => {
+    /* -> this child component receives parameter props
+         as object in its function signature which includes
+         all the passed attributes as properties
+
+        -> props - immutable data structure
+  */
+
+        // console.log('List component renders')
+   return (
+     <ul>
+       {
+         props.list.map((item) =>
+         (
+           <Item key={item.objectID} item={item} />
+           // Item is leaf component, a component which does not render any components
+         )
+         )
+       }
+     </ul>
+    )
+  }
 
 
-const Item = ({item}) => (
+const Item = (props) => {
 
-    <li key={item.objectID}>
+  // console.log('Item component renders')
+
+  return (
+    <li>
       <span>
-        <a href={item.url}>
-          {item.title}
+        <a href={props.item.url}>
+          {props.item.title}
         </a>
       </span>
 
-      <p id="author">Author: {item.author}</p>
-      <p id="comments">Comments: {item.num_comments}</p>
-      <p id="points">Points: {item.points}</p>
+      <p id="author">Author: {props.item.author}</p>
+      <p id="comments">Comments: {props.item.num_comments}</p>
+      <p id="points">Points: {props.item.points}</p>
     </li>
   )
+}
 
+const Form = () => {
 
-const Search = () =>  {
+  const handleSubmit = (e) => {
+    
+    e.preventDefault();
 
-  const handleChange = (event) => {
-    // Task
-    //const value = event.target.value
-
-    // console.log(value)
-
+    console.log('Form has been successfully submitted')
   }
 
-  const onLeave = (event) => {
+  return (
 
-    console.log(event.target.value)
+    <>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="username">Enter username</label>
+        <input type="text" id="username" />
+        <br />
+        <label htmlFor="password">Enter password</label>
+        <input type="text" id="password" />
+        <br />
+        <button type='submit'>Submit</button>
+      </form>
+    </>
+  )
+}
+    
+  
 
-  }
+
+const Search = (props) =>  {
+
+  //console.log('Search component renders!')
+
+
+  // props.onTest('Hello from Search component')
+
+  
 
   return (
     <>
     <div>
       <label htmlFor="search">Search: </label>
-      <input onChange={(e) => handleChange(e)} onBlur={onLeave} type="text" id='search'/>
-      <button type='submit'>Submit</button>
+      <input onChange={props.onSearch} type="text" id='search'/>
+      {/* <button type='submit'>Submit</button> */}
     </div>
     </>
     )
