@@ -37,16 +37,24 @@ const stories = [
   ]
 
 const [searchTerm, setSearchTerm] = useState('');
+const [checked, setChecked] = useState(false)
 
+
+const handleCheck = () => {
+
+  setChecked(state => !!state)
+}
   
 // -> this way we can notify the App component, when a user types into the input field in the Search component.
   const handleSearch = (event) => {
 
+    console.log('input field value is:', event.target.value)
     setSearchTerm(event.target.value)
  
   }
 
   const filteredStories = stories.filter((story) => story.title.toLowerCase().includes(searchTerm.toLowerCase()))
+  // substring 'react'
   
 
   const handleTest = (message) => {
@@ -60,7 +68,9 @@ return (
       <div>
         <h1>My Hacker Stories</h1>
       {/* Leaf component -> component which does not render any component */}
-        <Search onSearch={handleSearch} onTest={handleTest}/>
+        <Search search={searchTerm} onSearch={handleSearch} onTest={handleTest}/>
+        <hr />
+        <CheckBox check={checked} onCheck={handleCheck}/>
         <hr />
         {/* Here we instantiate List component */}
         <List list={filteredStories}/> 
@@ -140,10 +150,25 @@ const Form = () => {
     </>
   )
 }
+
+const CheckBox = (props) => {
+
+  return (
+    <>
+      <div>
+        <label htmlFor="checkbox">
+          Check:
+          {/*                                                                           false */}
+          <input onChange={props.onCheck} type="checkbox" id="checkbox" value={props.check}  />
+        </label>
+      </div>
+    </>
+  )
+}
     
   
 
-
+// -> This is a controlled component
 const Search = (props) =>  {
 
   //console.log('Search component renders!')
@@ -157,12 +182,13 @@ const Search = (props) =>  {
     <>
     <div>
       <label htmlFor="search">Search: </label>
-      <input onChange={props.onSearch} type="text" id='search'/>
+      {/* -> this input field is a controlled component */}
+      <input onChange={props.onSearch} type="text" id='search' value={props.search}/>
       {/* <button type='submit'>Submit</button> */}
     </div>
     </>
     )
-  }
+}
 
 
 export default App
