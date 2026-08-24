@@ -1,5 +1,6 @@
 import './App.css'
-import { useState } from 'react'
+import { useState,useEffect } from 'react'
+// import { useEffect } from 'react'
 //! Component has to start with Capital letter
 
 // const title = 'React'; // -> JavaScript string primitive
@@ -36,8 +37,50 @@ const stories = [
   }
   ]
 
-const [searchTerm, setSearchTerm] = useState('');
+  const useStorageState = (key,initialState) => {
+    // key -> 'search' initialState -> 'React'
+    
+    const [value, setValue] = useState(localStorage.getItem(key) || initialState); // 'React' 
+
+    useEffect(() => {
+      localStorage.setItem(key,value); // { search: 'React'}
+    },[value,key])
+
+    return [value, setValue]
+  }
+
+const [searchTerm, setSearchTerm] = useStorageState('search', 'React'); // searchTerm -> 'React'
+// const [applyTerm, setApplyTerm] = useStorageState('other-search','Angular'); // 'Angular'
+
+// const [applyTerm, setApplyTerm] = useStorageState('Angular'); // applyTerm -> 'React'
+// const [searchTerm, setSearchTerm] = useState(localStorage.getItem('search') ?? 'React');
 const [checked, setChecked] = useState(false)
+const [_id,setId] = useState(1)
+const [showData, setShowData] = useState(false)
+
+//! Form Handler
+const handleSubmit = (e) => {
+
+  e.preventDefault();
+  
+  if (_id !== '' && _id > 0 && _id <= 10) {
+    
+    setShowData(true)
+    console.log('Data component can be shown.')
+
+  }
+
+
+}
+
+//! Input change handler
+const handleChange = (e) => {
+
+console.log('Input value is:', e.target.value)
+
+setId(e.target.value)
+setShowData(false)
+}
 
 
 const handleCheck = () => {
@@ -48,8 +91,10 @@ const handleCheck = () => {
 // -> this way we can notify the App component, when a user types into the input field in the Search component.
   const handleSearch = (event) => {
 
-    console.log('input field value is:', event.target.value)
+    // console.log('input field value is:', event.target.value)
     setSearchTerm(event.target.value)
+
+    // localStorage.setItem('search',event.target.value);
  
   }
 
@@ -75,13 +120,45 @@ return (
         {/* Here we instantiate List component */}
         <List list={filteredStories}/> 
         <hr />
-        <Form />
-
+        <Form submit={handleSubmit} change={handleChange} id={_id} />
+        <hr />
+        {
+          showData && (
+            <DataDisplayer id={_id} />
+          )
+        }
+        
       </div>
     </>
     )
   }
 
+  const DataDisplayer = ({ id }) => {
+
+    const [data,setData] = useState(null);
+
+    useEffect(() => {
+
+      const fetchData = async() => {
+
+        const response = await fetch(`https://swapi.dev/api/people/${id}`);
+        const newData = await response.json();
+        setData(newData)
+      }
+
+      fetchData()
+
+    },[id])
+
+    if (data) {
+      return <div>Data is {data.name}</div>;
+    } else{
+      return null;
+    }
+
+    
+
+  }
 
 const List = ({ list }) => 
     /* -> this chi ld component receives parameter props
@@ -145,24 +222,17 @@ const Item = ({ url,title,author,num_comments,points }) =>
   )
 
 
-const Form = () => {
+const Form = ({ submit,change,id }) => {
 
-  const handleSubmit = (e) => {
-    
-    e.preventDefault();
-
-    console.log('Form has been successfully submitted')
-  }
+  
 
   return (
-
     <>
-      <form onSubmit={handleSubmit}>
-        <label htmlFor="username">Enter username</label>
-        <input type="text" id="username" />
-        <br />
-        <label htmlFor="password">Enter password</label>
-        <input type="text" id="password" />
+      <form onSubmit={submit}>
+        <label htmlFor="_id">
+          Enter ID:
+          <input onChange={change} type="text" name='_id' id='_id' value={id}/>
+        </label>
         <br />
         <button type='submit'>Submit</button>
       </form>
