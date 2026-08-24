@@ -83,8 +83,8 @@ return (
   }
 
 
-const List = (props) => {
-    /* -> this child component receives parameter props
+const List = ({ list }) => 
+    /* -> this chi ld component receives parameter props
          as object in its function signature which includes
          all the passed attributes as properties
 
@@ -92,39 +92,58 @@ const List = (props) => {
   */
 
         // console.log('List component renders')
-   return (
+    (
      <ul>
        {
-         props.list.map((item) =>
+          list.map(({objectID, ...items}) =>
          (
-           <Item key={item.objectID} item={item} />
+           <Item
+              key={objectID}
+              {...items}
+            />
            // Item is leaf component, a component which does not render any components
          )
          )
        }
      </ul>
     )
+  /*
+    {
+     title: 'React',
+    url: 'https://react.dev/',
+    author: 'Jordan Walke',
+    num_comments: 3,
+    points: 4,
+    objectID: 0
   }
+  */
 
 
-const Item = (props) => {
-
-  // console.log('Item component renders')
-
-  return (
+const Item = ({ url,title,author,num_comments,points }) => 
+/*
+  {
+     title: 'React',
+    url: 'https://react.dev/',
+    author: 'Jordan Walke',
+    num_comments: 3,
+    points: 4,
+    objectID: 0
+  }
+*/
+ (
     <li>
       <span>
-        <a href={props.item.url}>
-          {props.item.title}
+        <a href={url}>
+          {title}
         </a>
       </span>
 
-      <p id="author">Author: {props.item.author}</p>
-      <p id="comments">Comments: {props.item.num_comments}</p>
-      <p id="points">Points: {props.item.points}</p>
+      <p id="author">Author: {author}</p>
+      <p id="comments">Comments: {num_comments}</p>
+      <p id="points">Points: {points}</p>
     </li>
   )
-}
+
 
 const Form = () => {
 
@@ -151,44 +170,35 @@ const Form = () => {
   )
 }
 
-const CheckBox = (props) => {
-
-  return (
+const CheckBox = ({ onCheck, check }) => 
+ (
     <>
       <div>
         <label htmlFor="checkbox">
           Check:
           {/*                                                                           false */}
-          <input onChange={props.onCheck} type="checkbox" id="checkbox" value={props.check}  />
+          <input onChange={onCheck} type="checkbox" id="checkbox" value={check}  />
         </label>
       </div>
     </>
   )
-}
+
     
   
 
 // -> This is a controlled component
-const Search = (props) =>  {
-
-  //console.log('Search component renders!')
-
-
-  // props.onTest('Hello from Search component')
-
-  
-
-  return (
+// -> We destructure the   props object in the component's function signature
+const Search = ({ search,onSearch }) => (
     <>
     <div>
       <label htmlFor="search">Search: </label>
       {/* -> this input field is a controlled component */}
-      <input onChange={props.onSearch} type="text" id='search' value={props.search}/>
+      <input onChange={onSearch} type="text" id='search' value={search}/>
       {/* <button type='submit'>Submit</button> */}
     </div>
     </>
     )
-}
+
 
 
 export default App
